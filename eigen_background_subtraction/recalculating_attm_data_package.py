@@ -38,7 +38,7 @@ def get_edge_position(background_subtracted,savgol_win_size = 51,fit_range=10):
 
 		update_progress(i / background_subtracted.shape[0])
 
-		filtered_signal = savgol_filter(background_subtracted[i],51,1,1)      #calculates the rolling slope over 25 points
+		filtered_signal = savgol_filter(background_subtracted[i],savgol_win_size,2,1)      #calculates the rolling slope over 25 points
 		win_c = np.argmax(np.abs(filtered_signal))
 		initial_guess = [1,win_c,filtered_signal[win_c]]
 		try:
