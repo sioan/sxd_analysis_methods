@@ -56,11 +56,9 @@ def get_edge_position(background_subtracted,savgol_win_size = 51,fit_range=10):
 	return np.array(recalculated_atm), np.array(recalculated_atm_cov)
 
 
-    
+def get_background_coefficients(X,dropped_shot_mask,signal_of_interest_mask,svd_size=15):
 
-def subtract_background(X,dropped_shot_mask,signal_of_interest_mask,svd_size=15):
-
-	print("entering function")
+	print("getting background coefficients")
 	atm_backgrounds = X[dropped_shot_mask.astype(bool)]
 	print("dropped shots selected")
 	print(str(atm_backgrounds.shape))
@@ -78,6 +76,15 @@ def subtract_background(X,dropped_shot_mask,signal_of_interest_mask,svd_size=15)
 
 	#background_subtracted = my_dict[time_camera] - dot(dot(my_dict[time_camera][:,my_mask],pinv(v[:svd_size][:,my_mask])),v[:svd_size])
 	my_mask = signal_of_interest_mask
-	background_subtracted = X - np.dot(np.dot(X[:,my_mask],np.linalg.pinv(v[:svd_size][:,my_mask])),v[:svd_size])
+
+	return v,np.dot(X[:,my_mask],np.linalg.pinv(v[:svd_size][:,my_mask]))
+
+def subtract_background(X,dropped_shot_mask,signal_of_interest_mask,svd_size=15):
+
+	print("subtracting background")
+
+	v,coefs = get_background_coefficients(X,dropped_shot_mask,signal_of_interest_mask,svd_size=15)
+
+	background_subtracted = X - np.dot(coefs,v[:svd_size])
 
 	return background_subtracted
